@@ -10,31 +10,32 @@ class ToDo extends React.Component {
         tasks: [
             {
                 _id: idGenerator(),
-                text: 'dsfddddd dffffffffffff dffffffff'
+                text: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
             },
             {
                 _id: idGenerator(),
-                text: 'dsfddddd dffffffffffff dffffffff'
+                text: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
             },
             {
                 _id: idGenerator(),
-                text: 'dsfddddd dffffffffffff dffffffff'
+                text: 'ccccccccccccccccccccccccccccccc'
             },
             {
                 _id: idGenerator(),
-                text: 'dsfddddd dffffffffffff dffffffff'
+                text: 'ddddddddddddddddddddddddddd'
             },
             {
                 _id: idGenerator(),
-                text: 'dsfddddd dffffffffffff dffffffff'
+                text: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
             },
             {
                 _id: idGenerator(),
-                text: 'dsfddddd dffffffffffff dffffffff'
+                text: 'ffffffffffffffffffffffffff'
             }
         ],
         inputValue: '',
-        removeTasks: new Set()
+        removeTasks: new Set(),
+        isChecked: false
     }
     handleChange = (e) => {
         const { value } = e.target;
@@ -100,10 +101,27 @@ class ToDo extends React.Component {
 
         this.setState({
             removeTasks
+        }, () => {
+            this.setIsChecked();
         });
     }
+    handleRemoveCheckedTasks = () => {
+        let tasks = [...this.state.tasks];
+        const removeTasks = this.state.removeTasks;
+        tasks = tasks.filter(task => !removeTasks.has(task._id));
+        this.setState({
+            tasks,
+            removeTasks: new Set()
+        });
+    }
+    setIsChecked = () => {
+        console.log(this.state.removeTasks.size)
+        this.setState({
+            isChecked: !!this.state.removeTasks.size
+        })
+    }
     render() {
-        const { inputValue, tasks } = this.state
+        const { inputValue, tasks, isChecked } = this.state
         const tasksJSX = tasks.map(task => {
             return (
                 <Col
@@ -118,6 +136,8 @@ class ToDo extends React.Component {
                         task={task}
                         handleDeleteTask={this.handleDeleteTask}
                         handleCheck={this.handleCheck}
+                        isChecked={isChecked}
+                        toggleChecked={this.toggleChecked}
                     />
                 </Col>
             )
@@ -133,13 +153,14 @@ class ToDo extends React.Component {
                                 value={inputValue}
                                 placeholder="New Tast"
                                 onKeyDown={this.handleAddTask}
+                                disabled={!!isChecked}
                             />
                             <InputGroup.Append>
                                 <Button variant="outline-primary"
                                     type="button"
                                     value="Add Task"
                                     onClick={this.handleAddTask}
-                                    disabled={!inputValue}
+                                    disabled={!inputValue ||  !!isChecked}
                                 >
                                     Button
                                 </Button>
@@ -149,6 +170,15 @@ class ToDo extends React.Component {
                 </Row>
                 <Row className="justify-content-center">
                     {tasksJSX}
+                </Row>
+
+                <Row className="justify-content-center">
+                    <Button
+                        variant="outline-danger"
+                        onClick={this.handleRemoveCheckedTasks}
+                    >
+                        Remove Checked Tasks
+                    </Button>
                 </Row>
             </Container>
         )
