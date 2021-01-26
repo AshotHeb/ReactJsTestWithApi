@@ -22,7 +22,10 @@ class Task extends React.Component {
         })
     }
     render() {
-        const { task, handleDeleteTask ,isChecked} = this.props;
+        // if (true){
+        //     throw new Error('fffd');
+        // }
+        const { task, handleDeleteTask, isChecked } = this.props;
         const { checked } = this.state;
         return (
             <div className={`${styles.card} ${checked ? styles.checked : ''}`}>

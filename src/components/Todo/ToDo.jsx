@@ -43,7 +43,8 @@ class ToDo extends React.Component {
             inputValue: value
         })
     }
-    handleAddTask = ({ type, key }) => {
+    handleAddTask =  ({ type, key })  =>{
+     
         const { inputValue, tasks } = this.state;
         if (type === 'keydown' && !key === 'Enter') return;
         if (!inputValue) return;
@@ -121,6 +122,9 @@ class ToDo extends React.Component {
         })
     }
     render() {
+        if(Math.random() > 0.5){
+            throw new Error('The number is big from 0.5');
+        }
         const { inputValue, tasks, isChecked } = this.state
         const tasksJSX = tasks.map(task => {
             return (
