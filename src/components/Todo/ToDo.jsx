@@ -1,9 +1,9 @@
 import React from 'react';
-import styles from './task.module.css';
 import Task from '../Task';
 import idGenerator from '../../utils/idGenerator';
-import { Container, Row, Col, InputGroup, FormControl, Button } from 'react-bootstrap';
-
+import { Container, Row, Col, Button } from 'react-bootstrap';
+import AddTaskForm from '../AddTask';
+import Confirm from '../Confirm';
 
 class ToDo extends React.Component {
     state = {
@@ -16,39 +16,16 @@ class ToDo extends React.Component {
                 _id: idGenerator(),
                 text: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
             },
-            {
-                _id: idGenerator(),
-                text: 'ccccccccccccccccccccccccccccccc'
-            },
-            {
-                _id: idGenerator(),
-                text: 'ddddddddddddddddddddddddddd'
-            },
-            {
-                _id: idGenerator(),
-                text: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-            },
-            {
-                _id: idGenerator(),
-                text: 'ffffffffffffffffffffffffff'
-            }
         ],
-        inputValue: '',
         removeTasks: new Set(),
-        isChecked: false
+        isChecked: false,
+        isConfirmWindowOpen: false
     }
-    handleChange = (e) => {
-        const { value } = e.target;
-        this.setState({
-            inputValue: value
-        })
-    }
-    handleAddTask =  ({ type, key })  =>{
-     
-        const { inputValue, tasks } = this.state;
+
+    handleAddTask = ({ type, key }, inputValue, clearInputValue) => {
         if (type === 'keydown' && !key === 'Enter') return;
         if (!inputValue) return;
-
+        const { tasks } = this.state;
         if (
             (type === 'keydown' && key === 'Enter') ||
             type === 'click'
@@ -62,6 +39,8 @@ class ToDo extends React.Component {
             this.setState({
                 tasks: tasksCopy,
                 inputValue: ''
+            }, () => {
+                clearInputValue();
             })
         } else {
             return;
@@ -76,22 +55,11 @@ class ToDo extends React.Component {
             tasks: tasksCopy
         });
     }
-    // handleKeyDown = (e) => {
-    // enter ov avelacnel task
-    //     const { inputValue, tasks } = this.state;
-    //     const { key } = e;
-    //     if (key !== 'Enter') return;
-    //     const tasksCopy = [...tasks];
-    //     tasksCopy.push({
-    //         _id: idGenerator(),
-    //         text: inputValue
-    //     })
-    //     this.setState({
-    //         tasks: tasksCopy,
-    //         inputValue: ''
-    //     })
-
-    // }
+    toggleOpenConfirmWindow = () => {
+        this.setState({
+            isConfirmWindowOpen: !this.state.isConfirmWindowOpen
+        })
+    }
 
     handleCheck = (taskId) => {
         const removeTasks = new Set(this.state.removeTasks);
@@ -112,7 +80,8 @@ class ToDo extends React.Component {
         tasks = tasks.filter(task => !removeTasks.has(task._id));
         this.setState({
             tasks,
-            removeTasks: new Set()
+            removeTasks: new Set(),
+            isConfirmWindowOpen:false
         });
     }
     setIsChecked = () => {
@@ -122,10 +91,10 @@ class ToDo extends React.Component {
         })
     }
     render() {
-        if(Math.random() > 0.5){
-            throw new Error('The number is big from 0.5');
-        }
-        const { inputValue, tasks, isChecked } = this.state
+        const { tasks, isChecked, isConfirmWindowOpen  ,removeTasks} = this.state;
+
+
+
         const tasksJSX = tasks.map(task => {
             return (
                 <Col
@@ -144,47 +113,40 @@ class ToDo extends React.Component {
                         toggleChecked={this.toggleChecked}
                     />
                 </Col>
-            )
-        })
+            );
+        });
         return (
-            <Container>
-                <Row className="justify-content-center">
-                    <Col md={12} lg={10} xl={8}>
-                        <InputGroup className="mb-3">
-                            <FormControl
-                                type="text"
-                                onChange={this.handleChange}
-                                value={inputValue}
-                                placeholder="New Tast"
-                                onKeyDown={this.handleAddTask}
-                                disabled={!!isChecked}
+            <>
+                <Container>
+                    <Row className="justify-content-center">
+                        <Col md={12} lg={10} xl={8}>
+                            <AddTaskForm
+                                isChecked={isChecked}
+                                handleAddTask={this.handleAddTask}
                             />
-                            <InputGroup.Append>
-                                <Button variant="outline-primary"
-                                    type="button"
-                                    value="Add Task"
-                                    onClick={this.handleAddTask}
-                                    disabled={!inputValue ||  !!isChecked}
-                                >
-                                    Button
-                                </Button>
-                            </InputGroup.Append>
-                        </InputGroup>
-                    </Col>
-                </Row>
-                <Row className="justify-content-center">
-                    {tasksJSX}
-                </Row>
+                        </Col>
+                    </Row>
+                    <Row className="justify-content-center">
+                        {tasksJSX}
+                    </Row>
 
-                <Row className="justify-content-center">
-                    <Button
-                        variant="outline-danger"
-                        onClick={this.handleRemoveCheckedTasks}
-                    >
-                        Remove Checked Tasks
+                    <Row className="justify-content-center">
+                        <Button
+                            variant="outline-danger"
+                            disabled={!isChecked}
+                            onClick={this.toggleOpenConfirmWindow}
+                        >
+                            Remove Checked Tasks
                     </Button>
-                </Row>
-            </Container>
+                    </Row>
+                </Container>
+                { isConfirmWindowOpen && <Confirm
+                    toggleOpenConfirmWindow={this.toggleOpenConfirmWindow}
+                    handleRemoveCheckedTasks={this.handleRemoveCheckedTasks}
+                    removeTasksCount={removeTasks.size}
+                />
+                }
+            </>
         )
     }
 }
