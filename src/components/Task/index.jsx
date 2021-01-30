@@ -27,7 +27,7 @@ class Task extends React.PureComponent {
         // }
 
         console.log('Render  One Task');
-        const { task, handleDeleteTask, isChecked } = this.props;
+        const { task, handleDeleteTask, isChecked, handleOpenEditTaskModal } = this.props;
         const { checked } = this.state;
         return (
             <div className={`${styles.card} ${checked ? styles.checked : ''}`}>
@@ -51,6 +51,7 @@ class Task extends React.PureComponent {
                         <Button
                             disabled={!!isChecked}
                             variant="warning"
+                            onClick={() => handleOpenEditTaskModal(task)}
                         >
                             <FontAwesomeIcon icon={faEdit} />
                         </Button>
