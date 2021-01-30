@@ -81,11 +81,11 @@ class ToDo extends React.Component {
         this.setState({
             tasks,
             removeTasks: new Set(),
-            isConfirmWindowOpen:false
+            isConfirmWindowOpen:false,
+            isChecked:false
         });
     }
     setIsChecked = () => {
-        console.log(this.state.removeTasks.size)
         this.setState({
             isChecked: !!this.state.removeTasks.size
         })
