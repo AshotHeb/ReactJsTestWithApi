@@ -22,11 +22,6 @@ class Task extends React.PureComponent {
         })
     }
     render() {
-        // if (true){
-        //     throw new Error('fffd');
-        // }
-
-        console.log('Render  One Task');
         const { task, handleDeleteTask, isChecked, handleOpenEditTaskModal } = this.props;
         const { checked } = this.state;
         return (
@@ -37,9 +32,9 @@ class Task extends React.PureComponent {
                         onClick={this.onCheck}
                     />
                     <Card.Body>
-                        <Card.Title>{task.text.slice(2)}</Card.Title>
+                        <Card.Title>{task.title}</Card.Title>
                         <Card.Text>
-                            {task.text}
+                            {task.description}
                         </Card.Text>
                         <Button
                             disabled={!!isChecked}

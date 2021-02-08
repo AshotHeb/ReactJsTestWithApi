@@ -11,12 +11,12 @@ class EditTaskModal extends React.Component {
     handleChange = (e) => {
         const { value } = e.target;
         this.setState({
-            text: value
+            title: value
         })
     }
     render() {
         const { onClose, onSave } = this.props;
-        const { text } = this.state
+        const { title } = this.state
         return (
             <Modal
                 onHide={onClose}
@@ -31,13 +31,13 @@ class EditTaskModal extends React.Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <input type="text" value={text} onChange={this.handleChange} />
+                    <input type="text" value={title} onChange={this.handleChange} />
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={()=>onSave(this.state)}>
+                    <Button variant="primary" onClick={() => onSave(this.state)}>
                         Save changes
               </Button>
-                    <Button variant="secondary" onClick={onClose}>
+                    <Button variant="secondary" onClick={()=>onClose()}>
                         Close
               </Button>
 

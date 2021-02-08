@@ -1,47 +1,90 @@
 import styles from './addTask.module.css';
 import React from 'react';
-import { InputGroup, FormControl, Button } from 'react-bootstrap';
+import { Form, Button, Modal } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
 class AddTask extends React.Component {
     state = {
-        inputValue: ''
+        title: '',
+        description: '',
+        date: new Date()
     }
     handleChange = (e) => {
-        const { value } = e.target;
+        const { value, name } = e.target;
         this.setState({
-            inputValue: value
+            [name]: value
         })
     }
-    clearInputValue = () =>{
+    setDate = (date) => {
         this.setState({
-            inputValue:''
+            date: date
         })
     }
     render() {
-        const { inputValue } = this.state;
-        const { isChecked, handleAddTask } = this.props;
+        const { title, description, date } = this.state;
+        const { onSave, onClose } = this.props;
         return (
-            <div className={styles.addTaskForm}>
-                <InputGroup className="mb-3">
-                    <FormControl
-                        type="text"
-                        onChange={this.handleChange}
-                        value={inputValue}
-                        placeholder="New Tast"
-                        onKeyDown={(event) => handleAddTask(event, inputValue ,this.clearInputValue)}
-                        disabled={!!isChecked}
-                    />
-                    <InputGroup.Append>
-                        <Button variant="outline-primary"
-                            type="button"
-                            value="Add Task"
-                            onClick={(event) => handleAddTask(event, inputValue ,this.clearInputValue)}
-                            disabled={!inputValue || !!isChecked}
-                        >
-                            Add Task
-                    </Button>
-                    </InputGroup.Append>
-                </InputGroup>
-            </div>
+
+            <Modal
+                onHide={onClose}
+                show={true}
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Add Task Form
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body  onKeyPress={(e) => onSave(e, this.state)}>
+                    <Form>
+                        <Form.Group>
+                            <Form.Control
+                                type="text"
+                                name="title"
+                                onChange={this.handleChange}
+                                value={title}
+                                placeholder="Title"
+
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                type="text"
+                                name="description"
+                                onChange={this.handleChange}
+                                value={description}
+                                placeholder="Descirption"
+                                resize="none"
+
+                            />
+                        </Form.Group>
+                        <DatePicker
+                            selected={date}
+                            onChange={date => this.setDate(date)}
+                        />
+                    </Form>
+                </Modal.Body >
+                <Modal.Footer>
+                    <Button
+                        variant="primary"
+                        onClick={(e) => onSave(e, this.state)}
+                    >
+                        Add Task
+              </Button>
+                    <Button
+                        variant="secondary"
+                        onClick={() => onClose()}
+                    >
+                        Close
+              </Button>
+
+                </Modal.Footer>
+            </Modal >
+
+
         );
     };
 }

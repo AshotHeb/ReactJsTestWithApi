@@ -20,3 +20,11 @@ code {
   color:white;
   font-size: 25px;
 }
+
+.user {
+  border:1px solid black;
+  padding:25px;
+}
+textarea {
+  resize: none;
+}

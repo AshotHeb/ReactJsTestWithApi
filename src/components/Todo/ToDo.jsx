@@ -1,6 +1,5 @@
 import React from 'react';
 import Task from '../Task';
-import idGenerator from '../../utils/idGenerator';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import AddTaskForm from '../AddTask';
 import Confirm from '../Confirm';
@@ -8,78 +7,139 @@ import EditTaskModal from '../EditTaskModal';
 
 class ToDo extends React.Component {
     state = {
-        tasks: [
-            {
-                _id: idGenerator(),
-                text: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-            },
-            {
-                _id: idGenerator(),
-                text: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
-            },
-        ],
+        tasks: [],
         removeTasks: new Set(),
         isChecked: false,
         isConfirmWindowOpen: false,
-        editTask: null
+        editTask: null,
+        isAddTaskModalOpen: false
+    }
+    componentDidMount() {
+        fetch('http://localhost:3001/task')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw data.error;
+                }
+                this.setState({
+                    tasks: data,
+                })
+            })
+            .catch(error => {
+                console.log('Error Add Task', error);
+            })
+    }
+    toggleOpenAddTaskModal = () => {
+        this.setState({
+            isAddTaskModalOpen: !this.state.isAddTaskModalOpen
+        })
     }
     handleSaveEditTask = (task) => {
-        if (!task.text) return false;
-        const tasks = [...this.state.tasks];
-        const idx = tasks.findIndex(t => t._id === task._id);
-        tasks[idx] = task;
-        this.setState({
-            editTask: null,
-            tasks
-        });
+        if (!task.title) return false;
+        const body = {
+            ...task
+        }
+        delete body._id;
+        fetch('http://localhost:3001/task/' + task._id, {
+            method: 'PUT',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw data.error;
+                }
+                const tasks = [...this.state.tasks];
+                const idx = tasks.findIndex(t => t._id === data._id);
+                tasks[idx] = data;
+                this.setState({
+                    editTask: null,
+                    tasks
+                });
+            })
+            .catch(error => {
+                console.log('Error Add Task', error);
+            })
+
     }
     toggleOpenEditTaskModal = (task = null) => {
         this.setState({
             editTask: task
         })
     }
-    // handleOpenEditTaskModal = (task) => {
-    //     this.setState({
-    //         editTask: task
-    //     })
-    // }
-    // handleCloseEditTaskModal = () => {
-    //     this.setState({
-    //         editTask: null
-    //     })
-    // }
-    handleAddTask = ({ type, key }, inputValue, clearInputValue) => {
-        if (type === 'keydown' && !key === 'Enter') return;
-        if (!inputValue) return;
+    handleAddTask = (e, formData) => {
+        const { key, type } = e;
+        console.log('e' ,e);
+        if (type === 'keypress' && !key === 'Enter') return;
+        if (formData.title === '' ||
+            formData.description === '' ||
+            formData.date === ''
+        ) return;
         const { tasks } = this.state;
         if (
-            (type === 'keydown' && key === 'Enter') ||
+            (type === 'keypress' && key === 'Enter') ||
             type === 'click'
         ) {
+            const newTask = {
+                ...formData
+            }
+            newTask.date = newTask.date.toISOString().slice(0, 10);
+            fetch('http://localhost:3001/task', {
+                method: 'POST',
+                body: JSON.stringify(newTask),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw data.error;
+                    }
+                    const tasksCopy = [...tasks];
+                    tasksCopy.push(data);
+                    this.setState({
+                        isAddTaskModalOpen:false,
+                        tasks: tasksCopy,
+                    })
+                })
+                .catch(error => {
+                    console.log('Error Add Task', error);
+                })
 
-            const tasksCopy = [...tasks];
-            tasksCopy.push({
-                _id: idGenerator(),
-                text: inputValue
-            })
-            this.setState({
-                tasks: tasksCopy,
-                inputValue: ''
-            }, () => {
-                clearInputValue();
-            })
+
         } else {
             return;
         }
 
     }
     handleDeleteTask = (taskId) => {
-        const { tasks } = this.state;
-        let tasksCopy = [...tasks];
-        tasksCopy = tasksCopy.filter(task => task._id !== taskId);
-        this.setState({
-            tasks: tasksCopy
-        });
+
+        fetch('http://localhost:3001/task/' + taskId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw data.error;
+                }
+                const { tasks } = this.state;
+                let tasksCopy = [...tasks];
+                tasksCopy = tasksCopy.filter(task => task._id !== taskId);
+                this.setState({
+                    tasks: tasksCopy
+                });
+            })
+            .catch(error => {
+                console.log('Error Add Task', error);
+            })
+
     }
     toggleOpenConfirmWindow = () => {
         this.setState({
@@ -103,13 +163,34 @@ class ToDo extends React.Component {
     handleRemoveCheckedTasks = () => {
         let tasks = [...this.state.tasks];
         const removeTasks = this.state.removeTasks;
-        tasks = tasks.filter(task => !removeTasks.has(task._id));
-        this.setState({
-            tasks,
-            removeTasks: new Set(),
-            isConfirmWindowOpen: false,
-            isChecked: false
-        });
+        const body = {
+            tasks: [...removeTasks]
+        }
+        fetch('http://localhost:3001/task', {
+            method: 'PATCH',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw data.error;
+                }
+
+                tasks = tasks.filter(task => !removeTasks.has(task._id));
+                this.setState({
+                    tasks,
+                    removeTasks: new Set(),
+                    isConfirmWindowOpen: false,
+                    isChecked: false
+                });
+            })
+            .catch(error => {
+                console.log('Error Add Task', error);
+            })
+
     }
     setIsChecked = () => {
         this.setState({
@@ -117,7 +198,14 @@ class ToDo extends React.Component {
         })
     }
     render() {
-        const { tasks, isChecked, isConfirmWindowOpen, removeTasks, editTask } = this.state;
+        const {
+            tasks,
+            isChecked,
+            isConfirmWindowOpen,
+            removeTasks,
+            editTask,
+            isAddTaskModalOpen
+        } = this.state;
 
 
 
@@ -147,10 +235,14 @@ class ToDo extends React.Component {
                 <Container>
                     <Row className="justify-content-center">
                         <Col md={12} lg={10} xl={8}>
-                            <AddTaskForm
-                                isChecked={isChecked}
-                                handleAddTask={this.handleAddTask}
-                            />
+                            <Button
+                                variant="primary"
+                                onClick={this.toggleOpenAddTaskModal}
+                            >
+                                Add  New Task
+                            </Button>
+
+
                         </Col>
                     </Row>
                     <Row className="justify-content-center">
@@ -183,6 +275,13 @@ class ToDo extends React.Component {
                             onSave={this.handleSaveEditTask}
                         />
                     )
+                }
+
+                {
+                    isAddTaskModalOpen && <AddTaskForm
+                        onSave={this.handleAddTask}
+                        onClose={this.toggleOpenAddTaskModal}
+                    />
                 }
             </>
         )
