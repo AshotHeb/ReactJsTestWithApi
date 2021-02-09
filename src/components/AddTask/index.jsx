@@ -58,7 +58,6 @@ class AddTask extends React.Component {
                                 value={description}
                                 placeholder="Descirption"
                                 resize="none"
-
                             />
                         </Form.Group>
                         <DatePicker

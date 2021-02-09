@@ -1,6 +1,8 @@
 
 .card {
     border:1px solid black;
+    height:100%;
+    width: 100%;
 }
 .checked {
     border:1px solid red;

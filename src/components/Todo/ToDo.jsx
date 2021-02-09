@@ -72,7 +72,6 @@ class ToDo extends React.Component {
     }
     handleAddTask = (e, formData) => {
         const { key, type } = e;
-        console.log('e' ,e);
         if (type === 'keypress' && !key === 'Enter') return;
         if (formData.title === '' ||
             formData.description === '' ||
@@ -102,7 +101,7 @@ class ToDo extends React.Component {
                     const tasksCopy = [...tasks];
                     tasksCopy.push(data);
                     this.setState({
-                        isAddTaskModalOpen:false,
+                        isAddTaskModalOpen: false,
                         tasks: tasksCopy,
                     })
                 })
@@ -233,11 +232,12 @@ class ToDo extends React.Component {
         return (
             <>
                 <Container>
-                    <Row className="justify-content-center">
+                    <Row className="justify-content-center mt-5">
                         <Col md={12} lg={10} xl={8}>
                             <Button
                                 variant="primary"
                                 onClick={this.toggleOpenAddTaskModal}
+                                disabled={removeTasks.size}
                             >
                                 Add  New Task
                             </Button>
@@ -245,7 +245,7 @@ class ToDo extends React.Component {
 
                         </Col>
                     </Row>
-                    <Row className="justify-content-center">
+                    <Row className="justify-content-center mb-5">
                         {tasksJSX}
                     </Row>
 

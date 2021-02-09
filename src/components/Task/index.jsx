@@ -26,7 +26,7 @@ class Task extends React.PureComponent {
         const { checked } = this.state;
         return (
             <div className={`${styles.card} ${checked ? styles.checked : ''}`}>
-                <Card style={{ margin: '0 auto' }}>
+                <Card style={{ margin: '0 auto'}}>
                     <input
                         type="checkbox"
                         onClick={this.onCheck}
@@ -34,12 +34,20 @@ class Task extends React.PureComponent {
                     <Card.Body>
                         <Card.Title>{task.title}</Card.Title>
                         <Card.Text>
-                            {task.description}
+                            Description :{task.description}
                         </Card.Text>
+                        <Card.Text>
+                            Date :{task.date.slice(0,10)}
+                        </Card.Text>
+                        <Card.Text>
+                            Created_AT: {task.created_at.slice(0,10)}
+                        </Card.Text>
+
                         <Button
                             disabled={!!isChecked}
                             variant="danger"
                             onClick={() => handleDeleteTask(task._id)}
+                            className="mr-5"
                         >
                             <FontAwesomeIcon icon={faTrash} />
                         </Button>
