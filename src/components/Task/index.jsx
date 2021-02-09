@@ -4,7 +4,7 @@ import { Card, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
 
-class Task extends React.Component {
+class Task extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -25,7 +25,9 @@ class Task extends React.Component {
         // if (true){
         //     throw new Error('fffd');
         // }
-        const { task, handleDeleteTask, isChecked } = this.props;
+
+        console.log('Render  One Task');
+        const { task, handleDeleteTask, isChecked, handleOpenEditTaskModal } = this.props;
         const { checked } = this.state;
         return (
             <div className={`${styles.card} ${checked ? styles.checked : ''}`}>
@@ -49,6 +51,7 @@ class Task extends React.Component {
                         <Button
                             disabled={!!isChecked}
                             variant="warning"
+                            onClick={() => handleOpenEditTaskModal(task)}
                         >
                             <FontAwesomeIcon icon={faEdit} />
                         </Button>

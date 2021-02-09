@@ -4,6 +4,7 @@ import idGenerator from '../../utils/idGenerator';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import AddTaskForm from '../AddTask';
 import Confirm from '../Confirm';
+import EditTaskModal from '../EditTaskModal';
 
 class ToDo extends React.Component {
     state = {
@@ -19,9 +20,34 @@ class ToDo extends React.Component {
         ],
         removeTasks: new Set(),
         isChecked: false,
-        isConfirmWindowOpen: false
+        isConfirmWindowOpen: false,
+        editTask: null
     }
-
+    handleSaveEditTask = (task) => {
+        if (!task.text) return false;
+        const tasks = [...this.state.tasks];
+        const idx = tasks.findIndex(t => t._id === task._id);
+        tasks[idx] = task;
+        this.setState({
+            editTask: null,
+            tasks
+        });
+    }
+    toggleOpenEditTaskModal = (task = null) => {
+        this.setState({
+            editTask: task
+        })
+    }
+    // handleOpenEditTaskModal = (task) => {
+    //     this.setState({
+    //         editTask: task
+    //     })
+    // }
+    // handleCloseEditTaskModal = () => {
+    //     this.setState({
+    //         editTask: null
+    //     })
+    // }
     handleAddTask = ({ type, key }, inputValue, clearInputValue) => {
         if (type === 'keydown' && !key === 'Enter') return;
         if (!inputValue) return;
@@ -81,17 +107,17 @@ class ToDo extends React.Component {
         this.setState({
             tasks,
             removeTasks: new Set(),
-            isConfirmWindowOpen:false
+            isConfirmWindowOpen: false,
+            isChecked: false
         });
     }
     setIsChecked = () => {
-        console.log(this.state.removeTasks.size)
         this.setState({
             isChecked: !!this.state.removeTasks.size
         })
     }
     render() {
-        const { tasks, isChecked, isConfirmWindowOpen  ,removeTasks} = this.state;
+        const { tasks, isChecked, isConfirmWindowOpen, removeTasks, editTask } = this.state;
 
 
 
@@ -111,6 +137,7 @@ class ToDo extends React.Component {
                         handleCheck={this.handleCheck}
                         isChecked={isChecked}
                         toggleChecked={this.toggleChecked}
+                        handleOpenEditTaskModal={this.toggleOpenEditTaskModal}
                     />
                 </Col>
             );
@@ -140,11 +167,22 @@ class ToDo extends React.Component {
                     </Button>
                     </Row>
                 </Container>
-                { isConfirmWindowOpen && <Confirm
-                    toggleOpenConfirmWindow={this.toggleOpenConfirmWindow}
-                    handleRemoveCheckedTasks={this.handleRemoveCheckedTasks}
-                    removeTasksCount={removeTasks.size}
-                />
+                { isConfirmWindowOpen && (
+                    <Confirm
+                        toggleOpenConfirmWindow={this.toggleOpenConfirmWindow}
+                        handleRemoveCheckedTasks={this.handleRemoveCheckedTasks}
+                        removeTasksCount={removeTasks.size}
+                    />
+                )
+                }
+                {
+                    editTask && (
+                        <EditTaskModal
+                            onClose={this.toggleOpenEditTaskModal}
+                            editTask={editTask}
+                            onSave={this.handleSaveEditTask}
+                        />
+                    )
                 }
             </>
         )
