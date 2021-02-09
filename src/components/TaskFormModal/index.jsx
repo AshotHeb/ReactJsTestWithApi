@@ -2,12 +2,14 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import React from 'react';
 import DatePicker from 'react-datepicker';
 
-class EditTaskModal extends React.Component {
+class TaskFormModal extends React.Component {
     constructor(props) {
         super();
         this.state = {
             ...props.editTask,
-            date: props.date ? props.date : new Date()
+            date: props.editTask ? new Date(props.editTask.date) : new Date(),
+            title: props.editTask ? props.editTask.title : '',
+            description: props.editTask ? props.editTask.description : '',
         }
     }
     handleChange = (e) => {
@@ -24,6 +26,7 @@ class EditTaskModal extends React.Component {
     render() {
         const { onClose, onSave } = this.props;
         const { title, date, description } = this.state;
+
         return (
             <Modal
                 onHide={onClose}
@@ -34,11 +37,10 @@ class EditTaskModal extends React.Component {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Edit Task Modal
+                        {this.props.editTask ? 'Edit Task Modal' : 'Add New Task'}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {/* <input type="text" value={title} onChange={this.handleChange} /> */}
                     <Form>
                         <Form.Group>
                             <Form.Control
@@ -69,9 +71,9 @@ class EditTaskModal extends React.Component {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={() => onSave({...this.state ,date:date.toISOString().slice(0,10) })}>
-                        Save changes
-              </Button>
+                    <Button variant="primary" onClick={(e) => onSave(e, { ...this.state, date: date.toISOString().slice(0, 10) })}>
+                        {this.props.editTask ? 'Save changes' : 'Add Task'}
+                    </Button>
                     <Button variant="secondary" onClick={() => onClose()}>
                         Close
               </Button>
@@ -82,4 +84,4 @@ class EditTaskModal extends React.Component {
     }
 };
 
-export default EditTaskModal;
+export default TaskFormModal;

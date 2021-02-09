@@ -1,9 +1,8 @@
 import React from 'react';
 import Task from '../Task';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import AddTaskForm from '../AddTask';
 import Confirm from '../Confirm';
-import EditTaskModal from '../EditTaskModal';
+import TaskFormModal from '../TaskFormModal';
 
 class ToDo extends React.Component {
     state = {
@@ -34,7 +33,7 @@ class ToDo extends React.Component {
             isAddTaskModalOpen: !this.state.isAddTaskModalOpen
         })
     }
-    handleSaveEditTask = (task) => {
+    handleSaveEditTask = (e,task) => {
         if (!task.title) return false;
         const body = {
             ...task
@@ -82,13 +81,10 @@ class ToDo extends React.Component {
             (type === 'keypress' && key === 'Enter') ||
             type === 'click'
         ) {
-            const newTask = {
-                ...formData
-            }
-            newTask.date = newTask.date.toISOString().slice(0, 10);
+            
             fetch('http://localhost:3001/task', {
                 method: 'POST',
-                body: JSON.stringify(newTask),
+                body: JSON.stringify(formData),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -269,7 +265,7 @@ class ToDo extends React.Component {
                 }
                 {
                     editTask && (
-                        <EditTaskModal
+                        <TaskFormModal
                             onClose={this.toggleOpenEditTaskModal}
                             editTask={editTask}
                             onSave={this.handleSaveEditTask}
@@ -278,7 +274,7 @@ class ToDo extends React.Component {
                 }
 
                 {
-                    isAddTaskModalOpen && <AddTaskForm
+                    isAddTaskModalOpen && <TaskFormModal
                         onSave={this.handleAddTask}
                         onClose={this.toggleOpenAddTaskModal}
                     />
