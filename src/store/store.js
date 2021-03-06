@@ -1,6 +1,8 @@
-import { createStore } from 'redux';
+// import { createStore } from 'redux';
+// const initislState = {
 
-const reducer = () => {
+// }
+// const reducer = (state = initialState , action) => {
 
-}
-const store = createStore(reducer);
+// }
+// const store = createStore(reducer);

@@ -1,8 +1,8 @@
 import React from 'react';
-import Task from '../Task';
+import Task from '../../Task';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import Confirm from '../Confirm';
-import TaskFormModal from '../TaskFormModal';
+import Confirm from '../../Confirm';
+import TaskFormModal from '../../TaskFormModal';
 
 class ToDo extends React.Component {
     state = {
