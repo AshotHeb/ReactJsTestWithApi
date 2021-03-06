@@ -1,0 +1,12 @@
+.input {
+    width: 100%;
+    outline: none;
+}
+
+.errorArea {
+    border: 1px solid red;
+}
+
+.error {
+    color: red;
+}

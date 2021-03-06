@@ -1,0 +1,12 @@
+.textarea {
+    width: 100%;
+    outline: none;
+    resize: none;
+}
+
+.errorArea {
+    border: 1px solid red;
+}
+.error {
+    color:red;
+}
