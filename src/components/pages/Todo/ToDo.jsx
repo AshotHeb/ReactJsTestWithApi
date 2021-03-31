@@ -3,6 +3,8 @@ import Task from '../../Task';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Confirm from '../../Confirm';
 import TaskFormModal from '../../TaskFormModal';
+import { connect } from 'react-redux';
+
 
 class ToDo extends React.Component {
     state = {
@@ -14,26 +16,25 @@ class ToDo extends React.Component {
         isAddTaskModalOpen: false
     }
     componentDidMount() {
-        fetch('http://localhost:3001/task')
+        this.props.setLoading();
+        fetch('http://localhost:300')
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     throw data.error;
                 }
-                this.setState({
-                    tasks: data,
-                })
+                this.props.setTasks(data);
             })
             .catch(error => {
-                console.log('Error Add Task', error);
-            })
+                this.props.setErrorMessage(error);
+            });
     }
     toggleOpenAddTaskModal = () => {
         this.setState({
             isAddTaskModalOpen: !this.state.isAddTaskModalOpen
         })
     }
-    handleSaveEditTask = (e,task) => {
+    handleSaveEditTask = (e, task) => {
         if (!task.title) return false;
         const body = {
             ...task
@@ -81,7 +82,7 @@ class ToDo extends React.Component {
             (type === 'keypress' && key === 'Enter') ||
             type === 'click'
         ) {
-            
+
             fetch('http://localhost:3001/task', {
                 method: 'POST',
                 body: JSON.stringify(formData),
@@ -192,9 +193,14 @@ class ToDo extends React.Component {
             isChecked: !!this.state.removeTasks.size
         })
     }
+    componentDidUpdate() {
+        if (this.props.taskActionFailed) {
+            this.props.clearTaskActionFailed();
+        }
+    }
     render() {
         const {
-            tasks,
+            // tasks,
             isChecked,
             isConfirmWindowOpen,
             removeTasks,
@@ -202,8 +208,18 @@ class ToDo extends React.Component {
             isAddTaskModalOpen
         } = this.state;
 
+        const {
+            tasks,
+            taskActionSuccess,
+            // loading,
+            taskActionFailed,
+            errorMessage,
+        } = this.props;
 
 
+        // if (errorMessage) {
+        //     toast.error(errorMessage);
+        //   }
         const tasksJSX = tasks.map(task => {
             return (
                 <Col
@@ -279,9 +295,36 @@ class ToDo extends React.Component {
                         onClose={this.toggleOpenAddTaskModal}
                     />
                 }
+
+              
+
+
+
             </>
         )
     }
 }
 
-export default ToDo
+const mapStateToProps = (state) => {
+    return {
+        tasks: state.tasks,
+        taskActionSuccess: state.taskActionSuccess,
+        loading: state.loading,
+        taskActionFailed: state.taskActionFailed,
+        errorMessage: state.errorMessage
+    }
+
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setLoading: () => dispatch({ type: "LOADING" }),
+        setErrorMessage: (errorMessage) => dispatch({ type: "SET_ERROR_MESSAGE", errorMessage }),
+        setTasks: (tasks) => dispatch({ type: "SET_TASKS", tasks }),
+        addTask: (task) => dispatch({ type: "ADD_TASK", task }),
+        deleteTask: (_id) => dispatch({ type: "DELETE_TASK", _id }),
+        editTask: (task) => dispatch({ type: "EDIT_TASK", task }),
+        clearTaskActionFailed: () => dispatch({ type: "CLEAR_TASK_ACTION_FAILED" })
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ToDo)
